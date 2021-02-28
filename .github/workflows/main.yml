@@ -10,7 +10,9 @@ on:
 
 jobs:
   build:
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'push' || 
+      "! contains(toJSON(github.event.commits.*.message), '[#skip]')"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,7 +25,9 @@ jobs:
           checkstring: 'ok'
           rollbackonhealthcheckfailed: true
   tag:
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'push' || 
+      "! contains(toJSON(github.event.commits.*.message), '[#skip]')"
     runs-on: ubuntu-latest
     steps:
       - name: Bump version and push tag
