@@ -12,7 +12,7 @@ jobs:
   build:
     if: |
       github.event_name == 'push' || 
-      "! contains(toJSON(github.event.commits.*.message), '[#skip]')"
+      ${{! contains(toJSON(github.event.commits.*.message), '[#skip]')}}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -24,10 +24,17 @@ jobs:
           healthcheck: 'https://fullstackopen-pokedex2002.herokuapp.com/health'
           checkstring: 'ok'
           rollbackonhealthcheckfailed: true
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,took
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
   tag:
     if: |
       github.event_name == 'push' || 
-      "! contains(toJSON(github.event.commits.*.message), '[#skip]')"
+      ${{! contains(toJSON(github.event.commits.*.message), '[#skip]')}}
     runs-on: ubuntu-latest
     steps:
       - name: Bump version and push tag
